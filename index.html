@@ -202,16 +202,40 @@ a{color:inherit}
 .g-a,.g-d{grid-row:span 2}
 @media (max-width:760px){.ggrid{grid-template-columns:repeat(2,1fr)}.g-a,.g-d{grid-row:span 1}}
 
-.rev{border:1px dashed var(--rule);border-radius:2px;padding:clamp(28px,4vw,48px);display:flex;
-  flex-direction:column;gap:22px;align-items:center;text-align:center;background:var(--surface)}
-.rev__note{font-size:.86rem;color:var(--muted);max-width:56ch;margin:0}
-.rev__row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;margin-top:4px}
-@media (max-width:700px){.rev__row{grid-template-columns:1fr}}
-.rev__slot{border:1px dashed var(--rule);border-radius:2px;padding:22px;display:flex;flex-direction:column;
-  gap:10px;min-height:132px;justify-content:center;align-items:center}
-.rev__bar{height:7px;border-radius:99px;background:var(--rule);width:100%}
-.rev__bar.s{width:58%}
-.rev__cap{font-size:.66rem;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin:6px 0 0}
+.revhead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+  margin-bottom:clamp(26px,3.4vw,42px)}
+.revscore{display:flex;align-items:center;gap:14px}
+.revscore__n{font-family:var(--display);font-weight:500;font-size:clamp(2rem,1.5rem + 1.4vw,2.7rem);line-height:1;
+  font-variant-numeric:tabular-nums}
+.revscore__m{display:flex;flex-direction:column;gap:3px}
+.revscore__c{font-size:.78rem;color:var(--muted)}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px;fill:var(--accent);flex:none}
+.revwrap{position:relative}
+.revgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,22px)}
+@media (max-width:980px){.revgrid{grid-template-columns:repeat(2,1fr)}.revcard:nth-child(3){display:none}}
+@media (max-width:680px){.revgrid{grid-template-columns:1fr}.revcard:nth-child(2){display:none}}
+.revcard{background:var(--surface);border:1px solid var(--rule-soft);border-radius:2px;
+  padding:clamp(20px,2.4vw,28px);display:flex;flex-direction:column;gap:14px;min-height:236px;
+  text-decoration:none;color:inherit;
+  transition:opacity .34s cubic-bezier(.4,0,.2,1),transform .34s cubic-bezier(.4,0,.2,1),
+             box-shadow .3s ease,border-color .3s ease}
+.revcard:hover{box-shadow:var(--shadow);border-color:var(--rule)}
+.revcard.is-out{opacity:0;transform:translateY(-10px)}
+.revcard__top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.revcard__g{width:17px;height:17px;flex:none;opacity:.85}
+.revcard__txt{font-size:.92rem;color:var(--muted);margin:0;flex:1;line-height:1.62}
+.revcard__by{display:flex;align-items:center;gap:11px;margin-top:auto}
+.revcard__av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--on-accent);
+  display:grid;place-items:center;font-weight:600;font-size:.82rem;flex:none}
+.revcard__nm{font-weight:600;font-size:.87rem;line-height:1.3}
+.revcard__dt{font-size:.74rem;color:var(--faint)}
+.revdots{display:flex;gap:8px;justify-content:center;margin-top:clamp(22px,2.6vw,32px)}
+.revdots button{width:26px;height:4px;border-radius:99px;border:0;padding:0;cursor:pointer;
+  background:var(--rule);transition:background .3s ease,width .3s ease}
+.revdots button[aria-current="true"]{background:var(--accent);width:40px}
+.revfoot{display:flex;justify-content:center;margin-top:clamp(22px,2.6vw,30px)}
+.revnote{font-size:.78rem;color:var(--faint);text-align:center;margin:14px 0 0}
 
 .book{background:var(--surface);border-block:1px solid var(--rule)}
 .book__in{display:flex;gap:clamp(20px,4vw,56px);align-items:center;justify-content:space-between;
@@ -360,17 +384,30 @@ a{color:inherit}
 </section>
 
 <section class="sec wrap" style="padding-top:0" id="reviews">
-  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:clamp(24px,3vw,36px)" class="rv">
-    <p class="eyebrow">Guest reviews</p>
-    <h2 class="h2">What guests say</h2>
-  </div>
-  <div class="rev rv">
-    <p class="rev__note"><strong>This section is intentionally empty.</strong> Four review plugins are installed on the current site and none of them display anything, so nothing is shown here rather than inventing guest quotes. Once reviews sync from the Google Business profile, they populate this layout.</p>
-    <div class="rev__row">
-      <div class="rev__slot"><div class="rev__bar"></div><div class="rev__bar s"></div><p class="rev__cap">Review slot</p></div>
-      <div class="rev__slot"><div class="rev__bar"></div><div class="rev__bar s"></div><p class="rev__cap">Review slot</p></div>
-      <div class="rev__slot"><div class="rev__bar"></div><div class="rev__bar s"></div><p class="rev__cap">Review slot</p></div>
+  <div class="revhead rv">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="eyebrow">Guest reviews</p>
+      <h2 class="h2">What guests say</h2>
     </div>
+    <div style="display:flex;align-items:center;gap:clamp(18px,2.5vw,32px);flex-wrap:wrap">
+      <div class="revscore">
+        <div class="revscore__n" id="revAvg">&mdash;</div>
+        <div class="revscore__m">
+          <span class="stars" id="revStars"></span>
+          <span class="revscore__c" id="revCount">Google reviews</span>
+        </div>
+      </div>
+      <a class="btn btn--line" href="https://www.google.com/maps/search/?api=1&amp;query=Lakefront+Home+Hotel+Ooty" target="_blank" rel="noopener">Read on Google</a>
+    </div>
+  </div>
+
+  <div class="revwrap rv">
+    <div class="revgrid" id="revGrid"></div>
+    <div class="revdots" id="revDots"></div>
+    <div class="revfoot">
+      <a class="btn btn--solid" href="https://www.google.com/maps/search/?api=1&amp;query=Lakefront+Home+Hotel+Ooty" target="_blank" rel="noopener">See all reviews on Google</a>
+    </div>
+    <p class="revnote" id="revNote"></p>
   </div>
 </section>
 
@@ -507,6 +544,113 @@ a{color:inherit}
   window.addEventListener("load", sweep);
   window.addEventListener("scroll", sweep, { passive: true });
   window.addEventListener("resize", sweep);
+})();
+</script>
+
+<script>
+/* ============================================================
+   GUEST REVIEWS  —  edit only this block
+   Replace each entry with a real Google review: exact text,
+   the reviewer's name as shown publicly, rating and date.
+   Then set PLACEHOLDER = false to hide the notice.
+   ============================================================ */
+var PLACEHOLDER = true;
+var REVIEWS = [
+  { r:5, t:"Real Google review text goes here. Around this length keeps the three cards balanced on desktop.", n:"Reviewer name", d:"2 weeks ago" },
+  { r:5, t:"Second review. Paste the guest's words exactly as they appear on your Google listing.", n:"Reviewer name", d:"3 weeks ago" },
+  { r:5, t:"Third review. Shorter ones work well too, the cards keep an even height regardless.", n:"Reviewer name", d:"1 month ago" },
+  { r:5, t:"Fourth review. Nine in total, shown three at a time, rotating automatically.", n:"Reviewer name", d:"1 month ago" },
+  { r:4, t:"Fifth review. Ratings can vary, the stars follow whatever number you set here.", n:"Reviewer name", d:"2 months ago" },
+  { r:5, t:"Sixth review. Every card links straight through to your Google listing.", n:"Reviewer name", d:"2 months ago" },
+  { r:5, t:"Seventh review. Guests see the newest ones first if you order them that way.", n:"Reviewer name", d:"3 months ago" },
+  { r:5, t:"Eighth review. Keep them genuine, copied word for word from Google.", n:"Reviewer name", d:"3 months ago" },
+  { r:5, t:"Ninth review. Refresh these every few months so they stay current.", n:"Reviewer name", d:"4 months ago" }
+];
+var GOOGLE_URL = "https://www.google.com/maps/search/?api=1&query=Lakefront+Home+Hotel+Ooty";
+
+(function(){
+  var grid = document.getElementById("revGrid");
+  if (!grid || !REVIEWS.length) return;
+  var dotsEl = document.getElementById("revDots");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var PER = 3, pages = Math.ceil(REVIEWS.length / PER), page = 0, timer = null, busy = false;
+
+  var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
+  function stars(n){ var o=""; for(var i=0;i<n;i++) o+=STAR; return '<span class="stars">'+o+'</span>'; }
+  function esc(x){ return String(x).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  var GMARK = '<svg class="revcard__g" viewBox="0 0 48 48" aria-hidden="true">'
+    + '<path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-3.9H24v7.1h12c-.2 1.8-1.5 4.6-4.4 6.4l6.7 5.2C42.2 35.1 45 30 45 24z"/>'
+    + '<path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4c-1.9 1.3-4.4 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8 41.2 15.4 46 24 46z"/>'
+    + '<path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9z"/>'
+    + '<path fill="#EA4335" d="M24 10.4c4.1 0 6.9 1.8 8.5 3.3l6.2-6C34.9 4.2 29.9 2 24 2 15.4 2 8 6.8 4.4 14.1l7.1 5.5c1.8-5.3 6.7-9.2 12.5-9.2z"/></svg>';
+
+  function card(rv){
+    return '<a class="revcard" href="' + GOOGLE_URL + '" target="_blank" rel="noopener">'
+      + '<div class="revcard__top">' + stars(rv.r) + GMARK + '</div>'
+      + '<p class="revcard__txt">' + esc(rv.t) + '</p>'
+      + '<div class="revcard__by"><div class="revcard__av">' + esc(rv.n.trim().charAt(0)) + '</div>'
+      + '<div><div class="revcard__nm">' + esc(rv.n) + '</div>'
+      + '<div class="revcard__dt">' + esc(rv.d) + '</div></div></div></a>';
+  }
+
+  function slice(i){
+    var out = [];
+    for (var k = 0; k < PER; k++) out.push(REVIEWS[(i * PER + k) % REVIEWS.length]);
+    return out;
+  }
+
+  function paint(i){ grid.innerHTML = slice(i).map(card).join(""); }
+
+  /* staggered cascade: cards lift out one after another, swap, then settle back */
+  function go(i){
+    if (busy || i === page) return;
+    if (reduce){ page = i; paint(i); dots(); return; }
+    busy = true;
+    var cards = grid.children;
+    for (var k = 0; k < cards.length; k++){
+      (function(el, d){ setTimeout(function(){ el.classList.add("is-out"); }, d); })(cards[k], k * 90);
+    }
+    setTimeout(function(){
+      page = i; paint(i); dots();
+      var fresh = grid.children;
+      for (var k = 0; k < fresh.length; k++) fresh[k].classList.add("is-out");
+      void grid.offsetWidth;
+      for (var j = 0; j < fresh.length; j++){
+        (function(el, d){ setTimeout(function(){ el.classList.remove("is-out"); }, d); })(fresh[j], j * 90);
+      }
+      setTimeout(function(){ busy = false; }, 380 + PER * 90);
+    }, 340 + (PER - 1) * 90);
+  }
+
+  function dots(){
+    var out = "";
+    for (var i = 0; i < pages; i++)
+      out += '<button type="button" aria-label="Reviews page ' + (i+1) + '" aria-current="'
+           + (i === page ? "true" : "false") + '"></button>';
+    dotsEl.innerHTML = out;
+    for (var j = 0; j < dotsEl.children.length; j++)
+      (function(b, i){ b.addEventListener("click", function(){ stop(); go(i); start(); }); })(dotsEl.children[j], j);
+  }
+
+  function start(){ if (!reduce && pages > 1 && !timer) timer = setInterval(function(){ go((page + 1) % pages); }, 5200); }
+  function stop(){ clearInterval(timer); timer = null; }
+
+  paint(0); dots(); start();
+  grid.addEventListener("mouseenter", stop); grid.addEventListener("mouseleave", start);
+  grid.addEventListener("focusin", stop);    grid.addEventListener("focusout", start);
+  document.addEventListener("visibilitychange", function(){ document.hidden ? stop() : start(); });
+
+  /* summary figures derive from the data, never invented */
+  var sum = 0; for (var i = 0; i < REVIEWS.length; i++) sum += REVIEWS[i].r;
+  var avg = sum / REVIEWS.length;
+  document.getElementById("revAvg").textContent = avg.toFixed(1);
+  document.getElementById("revStars").innerHTML = stars(Math.round(avg));
+  document.getElementById("revCount").textContent = "Based on " + REVIEWS.length + " Google reviews";
+  if (PLACEHOLDER)
+    document.getElementById("revNote").textContent =
+      "Sample layout — real Google reviews drop into this component.";
 })();
 </script>
 </body>
