@@ -94,6 +94,30 @@
   window.addEventListener("scroll", sweep, { passive: true });
   window.addEventListener("resize", sweep);
 
+  /* room-detail photos — the page keeps its original three images, but gives
+     each one a clean full frame and an explicit photo selector. */
+  [].slice.call(document.querySelectorAll("[data-room-gallery]")).forEach(function(gallery){
+    var photos = [].slice.call(gallery.querySelectorAll("[data-room-photo]"));
+    var thumbs = [].slice.call(gallery.querySelectorAll("[data-room-photo-thumb]"));
+    var image = gallery.querySelector("[data-room-photo-image]");
+    var figure = gallery.querySelector("[data-lightbox]");
+    var current = gallery.querySelector("[data-room-photo-current]");
+    var index = 0;
+    function showPhoto(next) {
+      index = (next + photos.length) % photos.length;
+      var photo = photos[index];
+      image.src = photo.getAttribute("data-image");
+      image.alt = photo.getAttribute("data-alt");
+      figure.setAttribute("data-full", photo.getAttribute("data-image"));
+      image.style.animation = "none"; void image.offsetWidth; image.style.animation = "";
+      current.textContent = ("0" + (index + 1)).slice(-2);
+      thumbs.forEach(function(thumb, i){ var active = i === index; thumb.classList.toggle("is-active", active); thumb.setAttribute("aria-pressed", active ? "true" : "false"); });
+    }
+    gallery.querySelector("[data-room-photo-prev]").addEventListener("click", function(e){ e.stopPropagation(); showPhoto(index - 1); });
+    gallery.querySelector("[data-room-photo-next]").addEventListener("click", function(e){ e.stopPropagation(); showPhoto(index + 1); });
+    thumbs.forEach(function(thumb, i){ thumb.addEventListener("click", function(){ showPhoto(i); }); });
+  });
+
   /* enquiry form — the static site has no WordPress server behind it.  Keep
      the exact guest fields, then open the hotel's existing WhatsApp channel
      with a complete, editable enquiry rather than silently dropping it. */

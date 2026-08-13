@@ -284,11 +284,27 @@ def build_rooms():
             f'<a class="card__link" href="{o["slug"]}.html">See details &rarr;</a></div></article>'
             for o in others
         )
-        gal_html = "".join(
-            f'<figure{" class=\"tall\"" if i == 0 else ""} data-lightbox data-full="assets/{img}.webp">'
-            f'<img src="assets/{img}.webp" alt="{esc(r["name"])} &mdash; interior detail" loading="lazy"></figure>'
+        gallery_data = "".join(
+            f'<li data-room-photo data-image="assets/{img}.webp" data-alt="{esc(r["name"])} &mdash; interior detail"></li>'
+            for img in r["gallery"]
+        )
+        gallery_thumbs = "".join(
+            f'<button class="roomgallery__thumb{" is-active" if i == 0 else ""}" type="button" data-room-photo-thumb="{i}" aria-label="Show photo {i + 1}" aria-pressed="{"true" if i == 0 else "false"}">'
+            f'<img src="assets/{img}.webp" alt="" loading="lazy"></button>'
             for i, img in enumerate(r["gallery"])
         )
+        gallery_html = f'''<div class="roomgallery rv" data-room-gallery>
+  <figure class="roomgallery__main" data-lightbox data-full="assets/{r["gallery"][0]}.webp">
+    <img src="assets/{r["gallery"][0]}.webp" alt="{esc(r["name"])} &mdash; interior detail" data-room-photo-image>
+    <figcaption class="roomgallery__count"><span data-room-photo-current>01</span><i></i><span>0{len(r["gallery"])}</span></figcaption>
+    <div class="roomgallery__controls">
+      <button type="button" data-room-photo-prev aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" data-room-photo-next aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </figure>
+  <ol class="roomgallery__data" aria-hidden="true">{gallery_data}</ol>
+  <div class="roomgallery__thumbs" role="group" aria-label="Room photos">{gallery_thumbs}</div>
+</div>'''
         body = f'''<section class="subhero">
   <img class="subhero__img" src="assets/{r["img"]}.webp" alt="{esc(r["name"])}">
   <div class="subhero__inner wrap">
@@ -308,7 +324,7 @@ def build_rooms():
 </section>
 
 <section class="sec wrap">
-  <div class="rdgrid rv">{gal_html}</div>
+  {gallery_html}
 </section>
 
 <section class="book">
