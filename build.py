@@ -308,6 +308,7 @@ def build_rooms():
         body = f'''<section class="subhero">
   <img class="subhero__img" src="assets/{r["img"]}.webp" alt="{esc(r["name"])}">
   <div class="subhero__inner wrap">
+    <a class="subhero__back" href="index.html#rooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to rooms</a>
     <p class="subhero__eyebrow">Rooms &amp; suites</p>
     <h1 class="subhero__title">{r["name"]}</h1>
   </div>
@@ -341,7 +342,7 @@ def build_rooms():
   </div>
 </section>
 
-<section class="sec wrap" style="padding-top:0">
+<section class="sec wrap room-other">
   <p class="eyebrow" style="margin-bottom:12px">Other rooms</p>
   <div class="rd-otherrooms">{others_html}</div>
 </section>
