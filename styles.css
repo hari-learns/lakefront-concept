@@ -54,6 +54,15 @@ a{color:inherit}
 .mnav__close{position:absolute;top:18px;right:var(--gut);background:none;border:0;color:#F7F5F1;
   font-size:2rem;line-height:1;cursor:pointer;padding:8px}
 @media (max-width:860px){.nav__links{display:none}.burger{display:flex}}
+/* Keep both the booking shortcut and navigation available on narrow phones.
+   The full-size logo, CTA and menu previously exceeded a 390px viewport. */
+@media (max-width:640px){
+  .hdr{gap:6px;padding-block:18px}
+  .hdr__logo{height:clamp(25px,8vw,34px);min-width:0}
+  .nav{gap:clamp(4px,1vw,8px);flex-shrink:0}
+  .nav .btn{padding:11px clamp(13px,4vw,18px);font-size:.7rem;letter-spacing:.11em}
+  .burger{width:36px;height:36px;padding-inline:8px}
+}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--body);
   font-size:.78rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;padding:13px 24px;
