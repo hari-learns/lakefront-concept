@@ -85,6 +85,18 @@ POLICIES = [
     dict(slug="policy-terms", nav="Terms & Conditions", title="Terms and Conditions", src="terms-and-condition"),
 ]
 
+# These are the public URLs indexed by the WordPress site.  GitHub Pages does
+# not provide server-side redirects, so each path gets a small, relative
+# redirect document.  Relative targets work both at the GitHub project URL and
+# later at the root of lakefronthomehotel.com.
+LEGACY_PATHS = {
+    "room-1": "room-family-multi-suite.html",
+    "2024/02/privacypolicy": "policy-privacy.html",
+    "2024/02/booking-policy": "policy-booking.html",
+    "2024/02/cancellation-policy": "policy-cancellation.html",
+    "2024/02/terms-and-condition": "policy-terms.html",
+}
+
 
 def esc(s):
     return html.escape(s, quote=True)
@@ -132,7 +144,7 @@ def header(home):
 </div>'''
 
 
-FOOTER = '''<footer class="wrap" id="contact">
+FOOTER = '''<footer class="wrap">
   <div class="ft">
     <div class="ft__brand">
       <img class="ft__logo" src="assets/logo.png" alt="Lakefront Home Hotel">
@@ -422,6 +434,45 @@ def build_404():
          "This page could not be found.", body)
 
 
+# -------------------------------------------------------- legacy URL paths --
+def build_legacy_aliases():
+    """Keep the old WordPress links usable on a static host.
+
+    A real 301 belongs in the final hosting/DNS configuration.  Until then,
+    this immediate, relative redirect is the portable option supported by
+    GitHub Pages and by a future custom domain.
+    """
+    for legacy_path, target in LEGACY_PATHS.items():
+        output_dir = legacy_path
+        output_path = os.path.join(output_dir, "index.html")
+        os.makedirs(output_dir, exist_ok=True)
+        target_href = os.path.relpath(target, start=output_dir).replace(os.sep, "/")
+        asset_href = os.path.relpath("assets/logo.png", start=output_dir).replace(os.sep, "/")
+        style_href = os.path.relpath("styles.css", start=output_dir).replace(os.sep, "/")
+        title = "Lakefront Home Hotel"
+        doc = f'''<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="0; url={esc(target_href)}">
+<title>{title}</title>
+<link rel="stylesheet" href="{esc(style_href)}">
+</head>
+<body>
+<main class="legacy-redirect">
+  <img src="{esc(asset_href)}" alt="Lakefront Home Hotel">
+  <p>Taking you to Lakefront Home Hotel.</p>
+  <a class="btn btn--solid" href="{esc(target_href)}">Continue</a>
+</main>
+<script>window.location.replace({target_href!r});</script>
+</body>
+</html>
+'''
+        open(output_path, "w", encoding="utf-8").write(doc)
+
+
 # ------------------------------------------------------- homepage rebuild --
 def rebuild_homepage(room_cards):
     # Always rebuild from template-home.html, never from index.html itself —
@@ -463,5 +514,6 @@ if __name__ == "__main__":
     build_gallery()
     build_policies()
     build_404()
+    build_legacy_aliases()
     rebuild_homepage(cards)
     print("build complete")

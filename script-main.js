@@ -94,6 +94,27 @@
   window.addEventListener("scroll", sweep, { passive: true });
   window.addEventListener("resize", sweep);
 
+  /* enquiry form — the static site has no WordPress server behind it.  Keep
+     the exact guest fields, then open the hotel's existing WhatsApp channel
+     with a complete, editable enquiry rather than silently dropping it. */
+  var enquiry = document.querySelector("[data-enquiry-form]");
+  if (enquiry) {
+    var enquiryStatus = enquiry.querySelector("[data-enquiry-status]");
+    enquiry.addEventListener("submit", function(e){
+      e.preventDefault();
+      if (!enquiry.checkValidity()) { enquiry.reportValidity(); return; }
+      var data = new FormData(enquiry);
+      var message = "Hello Lakefront Home Hotel, I would like to enquire about a stay.\n\n"
+        + "Name: " + data.get("name") + "\n"
+        + "Email: " + data.get("email") + "\n"
+        + "Subject: " + data.get("subject") + "\n"
+        + "Message: " + data.get("message");
+      var destination = "https://wa.me/919385620698?text=" + encodeURIComponent(message);
+      window.open(destination, "_blank", "noopener");
+      if (enquiryStatus) enquiryStatus.textContent = "WhatsApp opened with your enquiry ready to send.";
+    });
+  }
+
   /* lightbox — gallery page and room-detail photo grids */
   var lb = document.getElementById("lightbox");
   if (lb) {
