@@ -274,6 +274,65 @@ def build_rooms():
             f'<a class="card__link" href="{r["slug"]}.html">See details &rarr;</a></div></article>'
         )
 
+    slides = "\n".join(
+        f'''<li class="roomshow__slide" data-room-slide
+  data-name="{esc(r["name"])}" data-copy="{esc(re.sub('<[^<]+?>', '', r["blurb"]))}"
+  data-link="{r["slug"]}.html" data-image="assets/{r["img"]}.webp"
+  data-alt="{esc(r["name"])}" data-ideal="{esc(r["ideal"])}" data-bed="{esc(r["bed"])}"></li>'''
+        for r in ROOMS
+    )
+    thumbs = "\n".join(
+        f'''<button class="roomshow__thumb{' is-active' if i == 0 else ''}" type="button" data-room-thumb="{i}" aria-label="Show {esc(r["name"])}" aria-pressed="{'true' if i == 0 else 'false'}">
+  <img src="assets/{r["img"]}.webp" alt="" loading="lazy"><span>{i + 1:02d}</span>
+</button>'''
+        for i, r in enumerate(ROOMS)
+    )
+    carousel_html = f'''<div class="roomshow rv" data-roomshow>
+  <div class="roomshow__media"><img src="assets/{ROOMS[0]["img"]}.webp" alt="{esc(ROOMS[0]["name"])}" data-room-image></div>
+  <div class="roomshow__content">
+    <div class="roomshow__count"><span data-room-current>01</span><i></i><span>06</span></div>
+    <div class="roomshow__copy">
+      <p class="eyebrow">Rooms &amp; suites</p>
+      <h3 class="roomshow__title" data-room-name>{ROOMS[0]["name"]}</h3>
+      <p class="roomshow__text" data-room-copy>{ROOMS[0]["blurb"]}</p>
+      <div class="roomshow__specs"><span data-room-ideal>{ROOMS[0]["ideal"]}</span><span data-room-bed>{ROOMS[0]["bed"]}</span></div>
+      <a class="card__link" href="{ROOMS[0]["slug"]}.html" data-room-link>See details &rarr;</a>
+    </div>
+    <div class="roomshow__controls">
+      <button type="button" class="roomshow__arrow" data-room-prev aria-label="Previous room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="roomshow__arrow" data-room-next aria-label="Next room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <ol class="roomshow__data" aria-hidden="true">{slides}</ol>
+  <div class="roomshow__thumbs" role="group" aria-label="Choose a room">{thumbs}</div>
+</div>'''
+
+    all_cards = "".join(card_html[r["slug"]] for r in ROOMS)
+    all_rooms_body = f'''<section class="subhero">
+  <img class="subhero__img" src="assets/rm_honeymoon.webp" alt="A room at Lakefront Home Hotel">
+  <div class="subhero__inner wrap">
+    <p class="subhero__eyebrow">Rooms &amp; suites</p>
+    <h1 class="subhero__title">The best budget-friendly rooms in Ooty</h1>
+  </div>
+</section>
+
+<section class="sec wrap">
+  <div class="rgrid">{all_cards}</div>
+</section>
+
+<section class="book">
+  <div class="wrap book__in">
+    <div class="book__txt">
+      <p class="eyebrow">Reservations</p>
+      <h2 class="h2">Book now for luxury<br>and tranquility</h2>
+      <p class="lede">Rooms are held on the hotel's own booking engine.</p>
+    </div>
+    <a class="btn btn--solid" href="{BOOK}" target="_blank" rel="noopener">Check availability</a>
+  </div>
+</section>'''
+    page("rooms.html", "Rooms & Suites — Lakefront Home Hotel",
+         "Explore all six room types at Lakefront Home Hotel, Ooty.", all_rooms_body)
+
     for r in ROOMS:
         others = [x for x in ROOMS if x["slug"] != r["slug"]][:3]
         others_html = "".join(
@@ -340,7 +399,7 @@ def build_rooms():
              f'{r["name"]} — Lakefront Home Hotel',
              re.sub(r'&mdash;', '—', re.sub('<[^<]+?>', '', r["blurb"]))[:157],
              body)
-    return card_html
+    return carousel_html
 
 
 # ---------------------------------------------------------- policy pages --
@@ -474,7 +533,7 @@ def build_legacy_aliases():
 
 
 # ------------------------------------------------------- homepage rebuild --
-def rebuild_homepage(room_cards):
+def rebuild_homepage(room_carousel):
     # Always rebuild from template-home.html, never from index.html itself —
     # index.html is a generated artifact, so reading it back in would make this
     # step non-idempotent (it already has the external <link>/<script src> and
@@ -490,8 +549,11 @@ def rebuild_homepage(room_cards):
 
     old_grid = re.search(r'<div class="rgrid">.*?</div>\s*</section>', src, re.S)
     assert old_grid, "room grid not found"
-    new_cards = "".join(room_cards[r["slug"]] for r in ROOMS)
-    src = src[:old_grid.start()] + f'<div class="rgrid">{new_cards}</div>\n</section>' + src[old_grid.end():]
+    src = src[:old_grid.start()] + room_carousel + '\n</section>' + src[old_grid.end():]
+
+    src = src.replace(
+        'href="https://www.secure-booking-engine.com/accounts/2S8j5jeLZTQDF2DJYkD8OA/properties/nnvHaXiO3ObYitpHgYS-mA/booking-engine/web/source/4wsctBw6Oq6j-g9XuxeRzQ/" target="_blank" rel="noopener">All availability',
+        'href="rooms.html">View all 6 rooms')
 
     src = src.replace('<a href="#gallery">Gallery</a>', '<a href="gallery.html">Gallery</a>')
 
@@ -510,10 +572,10 @@ def rebuild_homepage(room_cards):
 
 
 if __name__ == "__main__":
-    cards = build_rooms()
+    carousel = build_rooms()
     build_gallery()
     build_policies()
     build_404()
     build_legacy_aliases()
-    rebuild_homepage(cards)
+    rebuild_homepage(carousel)
     print("build complete")
