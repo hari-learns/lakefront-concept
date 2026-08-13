@@ -94,40 +94,6 @@
   window.addEventListener("scroll", sweep, { passive: true });
   window.addEventListener("resize", sweep);
 
-  /* room explorer — all six categories remain available, without making the
-     homepage feel like a wall of identical cards. */
-  var roomshow = document.querySelector("[data-roomshow]");
-  if (roomshow) {
-    var roomSlides = [].slice.call(roomshow.querySelectorAll("[data-room-slide]"));
-    var roomThumbs = [].slice.call(roomshow.querySelectorAll("[data-room-thumb]"));
-    var roomImage = roomshow.querySelector("[data-room-image]");
-    var roomName = roomshow.querySelector("[data-room-name]");
-    var roomCopy = roomshow.querySelector("[data-room-copy]");
-    var roomIdeal = roomshow.querySelector("[data-room-ideal]");
-    var roomBed = roomshow.querySelector("[data-room-bed]");
-    var roomLink = roomshow.querySelector("[data-room-link]");
-    var roomCurrent = roomshow.querySelector("[data-room-current]");
-    var roomIndex = 0;
-    function showRoom(next) {
-      roomIndex = (next + roomSlides.length) % roomSlides.length;
-      var item = roomSlides[roomIndex];
-      roomImage.src = item.getAttribute("data-image");
-      roomImage.alt = item.getAttribute("data-alt");
-      roomImage.style.animation = "none"; void roomImage.offsetWidth; roomImage.style.animation = "";
-      roomName.textContent = item.getAttribute("data-name");
-      roomCopy.textContent = item.getAttribute("data-copy");
-      roomIdeal.textContent = item.getAttribute("data-ideal");
-      roomBed.textContent = item.getAttribute("data-bed");
-      roomLink.href = item.getAttribute("data-link");
-      roomCurrent.textContent = ("0" + (roomIndex + 1)).slice(-2);
-      roomThumbs.forEach(function(thumb, i){ var active = i === roomIndex; thumb.classList.toggle("is-active", active); thumb.setAttribute("aria-pressed", active ? "true" : "false"); });
-    }
-    roomshow.querySelector("[data-room-prev]").addEventListener("click", function(){ showRoom(roomIndex - 1); });
-    roomshow.querySelector("[data-room-next]").addEventListener("click", function(){ showRoom(roomIndex + 1); });
-    roomThumbs.forEach(function(thumb, i){ thumb.addEventListener("click", function(){ showRoom(i); }); });
-    roomshow.addEventListener("keydown", function(e){ if(e.key === "ArrowLeft") showRoom(roomIndex - 1); if(e.key === "ArrowRight") showRoom(roomIndex + 1); });
-  }
-
   /* enquiry form — the static site has no WordPress server behind it.  Keep
      the exact guest fields, then open the hotel's existing WhatsApp channel
      with a complete, editable enquiry rather than silently dropping it. */
