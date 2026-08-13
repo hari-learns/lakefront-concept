@@ -6,7 +6,7 @@
      every page shares this script via the header/footer partials. */
   var host = document.getElementById("cycler");
   if (host) {
-    var words = ["Charm","Heritage","Nature","Luxury","Tranquility"];
+    var words = ["Heritage","Nature","Luxury","Tranquility"];
     words.forEach(function(w,i){
       var s = document.createElement("span");
       s.className = "cyc" + (i === 0 ? " on" : "");
@@ -17,9 +17,12 @@
       var idx = 0, items = host.querySelectorAll(".cyc");
       setInterval(function(){
         items[idx].classList.remove("on");
+        items[idx].classList.add("exit");
         idx = (idx + 1) % items.length;
+        items[idx].classList.remove("exit");
         items[idx].classList.add("on");
-      }, 2600);
+        setTimeout(function(){ items.forEach(function(item){ if(!item.classList.contains("on")) item.classList.remove("exit"); }); }, 800);
+      }, 3600);
     }
   }
 
