@@ -143,7 +143,7 @@ a{color:inherit}
 .amen__ico svg{width:19px;height:19px}
 .amen__i:hover .amen__ico{background:var(--accent);border-color:var(--accent);color:var(--on-accent);
   transform:scale(1.08) rotate(-6deg)}
-.amen__txt{display:flex;flex-direction:column;gap:3px}
+.amen__txt{display:flex;flex-direction:column;gap:3px;min-width:0}
 .amen__k{font-family:var(--display);font-style:italic;font-size:.76rem;color:var(--faint);
   font-variant-numeric:tabular-nums}
 .amen__t{font-size:.93rem;font-weight:500}
