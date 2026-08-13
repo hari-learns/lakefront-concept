@@ -17,6 +17,7 @@ var GOOGLE_URL = "https://www.google.com/travel/search?q=lakefront%20home%20hote
   var track = document.getElementById("revTrack");
   if (!track || !REVIEWS.length) return;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var mobile = window.matchMedia("(max-width: 640px)").matches;
 
   var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
   function stars(n){ var o=""; for(var i=0;i<n;i++) o+=STAR; return '<span class="stars">'+o+'</span>'; }
@@ -42,7 +43,21 @@ var GOOGLE_URL = "https://www.google.com/travel/search?q=lakefront%20home%20hote
      seamless infinite loop: as the first copy scrolls off, the second is
      already in the same position, so the seam is invisible. */
   var once = REVIEWS.map(card).join("");
-  track.innerHTML = reduce ? once : once + once;
+  track.innerHTML = (reduce || mobile) ? once : once + once;
+
+  /* A readable, automatic one-at-a-time presentation for phones. It avoids
+     the desktop marquee's masked transition crossing an entire phone width. */
+  if (mobile) {
+    var cards = track.querySelectorAll(".revcard");
+    var current = 0;
+    function showReview(index) {
+      for (var j = 0; j < cards.length; j++) cards[j].classList.toggle("is-mobile-active", j === index);
+    }
+    showReview(current);
+    if (!reduce && cards.length > 1) {
+      window.setInterval(function(){ current = (current + 1) % cards.length; showReview(current); }, 5600);
+    }
+  }
 
   var sum = 0; for (var i = 0; i < REVIEWS.length; i++) sum += REVIEWS[i].r;
   var avg = sum / REVIEWS.length;

@@ -257,6 +257,18 @@ a{color:inherit}
 .revcard__dt{font-size:.74rem;color:var(--faint)}
 .revfoot{display:flex;justify-content:center;margin-top:clamp(26px,3vw,38px)}
 .revnote{font-size:.78rem;color:var(--faint);text-align:center;margin:14px 0 0}
+/* On phones, show a single complete review and rotate it. The desktop marquee
+   has too little visible width on a narrow screen and can leave a blank frame
+   while an off-screen card crosses the masked edge. */
+@media (max-width:640px){
+  .revmarquee{min-height:292px;-webkit-mask-image:none;mask-image:none}
+  .revmarquee.rv{opacity:1;transform:none}
+  .revtrack{display:block;width:100%;animation:none;position:relative}
+  .revcard{display:none;min-height:292px;padding:22px;animation:review-card-in .45s ease both}
+  .revcard.is-mobile-active{display:flex}
+  .revcard__txt{-webkit-line-clamp:6}
+}
+@keyframes review-card-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
   .revtrack{animation:none;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px}
   .revcard{scroll-snap-align:start}
