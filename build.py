@@ -3,6 +3,7 @@
 Every page shares styles.css / script-main.js (and script-reviews.js on the
 homepage only). Run: python3 build.py
 """
+import hashlib
 import html
 import os
 import re
@@ -10,6 +11,7 @@ import re
 BOOK = ("https://www.secure-booking-engine.com/accounts/2S8j5jeLZTQDF2DJYkD8OA/"
         "properties/nnvHaXiO3ObYitpHgYS-mA/booking-engine/web/source/4wsctBw6Oq6j-g9XuxeRzQ/")
 WHATSAPP = "https://wa.me/919385620698"
+STYLE_VERSION = hashlib.sha256(open("styles.css", "rb").read()).hexdigest()[:12]
 
 ROOMS = [
     # slug, name, hero image, short blurb (homepage card copy, unchanged),
@@ -194,7 +196,7 @@ def page(path, title, description, body, home=False, extra_scripts=""):
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:image" content="assets/hero.webp">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#127968;</text></svg>">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v={STYLE_VERSION}">
 </head>
 <body>
 <div class="page">
@@ -465,7 +467,7 @@ def build_legacy_aliases():
         os.makedirs(output_dir, exist_ok=True)
         target_href = os.path.relpath(target, start=output_dir).replace(os.sep, "/")
         asset_href = os.path.relpath("assets/logo.png", start=output_dir).replace(os.sep, "/")
-        style_href = os.path.relpath("styles.css", start=output_dir).replace(os.sep, "/")
+        style_href = os.path.relpath("styles.css", start=output_dir).replace(os.sep, "/") + f"?v={STYLE_VERSION}"
         title = "Lakefront Home Hotel"
         doc = f'''<!doctype html>
 <html lang="en">
@@ -498,7 +500,7 @@ def rebuild_homepage(room_cards):
     # local page links a second run would try, and fail, to re-derive).
     src = open("template-home.html", encoding="utf-8").read()
 
-    src = re.sub(r'<style>.*?</style>', '<link rel="stylesheet" href="styles.css">', src, flags=re.S)
+    src = re.sub(r'<style>.*?</style>', f'<link rel="stylesheet" href="styles.css?v={STYLE_VERSION}">', src, flags=re.S)
 
     scripts = re.findall(r'<script>.*?</script>', src, re.S)
     assert len(scripts) == 2, f"expected 2 inline script blocks in the template, found {len(scripts)}"
