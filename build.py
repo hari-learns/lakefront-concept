@@ -12,6 +12,8 @@ BOOK = ("https://www.secure-booking-engine.com/accounts/2S8j5jeLZTQDF2DJYkD8OA/"
         "properties/nnvHaXiO3ObYitpHgYS-mA/booking-engine/web/source/4wsctBw6Oq6j-g9XuxeRzQ/")
 WHATSAPP = "https://wa.me/919385620698"
 STYLE_VERSION = hashlib.sha256(open("styles.css", "rb").read()).hexdigest()[:12]
+MAIN_SCRIPT_VERSION = hashlib.sha256(open("script-main.js", "rb").read()).hexdigest()[:12]
+REVIEWS_SCRIPT_VERSION = hashlib.sha256(open("script-reviews.js", "rb").read()).hexdigest()[:12]
 
 ROOMS = [
     # slug, name, hero image, short blurb (homepage card copy, unchanged),
@@ -209,7 +211,7 @@ def page(path, title, description, body, home=False, extra_scripts=""):
 
 {WAFLOAT}
 
-<script src="script-main.js"></script>
+<script src="script-main.js?v={MAIN_SCRIPT_VERSION}"></script>
 {extra_scripts}</div>
 </body>
 </html>
@@ -504,8 +506,8 @@ def rebuild_homepage(room_cards):
 
     scripts = re.findall(r'<script>.*?</script>', src, re.S)
     assert len(scripts) == 2, f"expected 2 inline script blocks in the template, found {len(scripts)}"
-    src = src.replace(scripts[0], '<script src="script-main.js"></script>')
-    src = src.replace(scripts[1], '<script src="script-reviews.js"></script>')
+    src = src.replace(scripts[0], f'<script src="script-main.js?v={MAIN_SCRIPT_VERSION}"></script>')
+    src = src.replace(scripts[1], f'<script src="script-reviews.js?v={REVIEWS_SCRIPT_VERSION}"></script>')
 
     old_grid = re.search(r'<div class="rgrid">.*?</div>\s*</section>', src, re.S)
     assert old_grid, "room grid not found"
